@@ -1,0 +1,21 @@
+input PaginationInput {
+    limit: Int
+    offset: Int
+}
+
+input EarthquakeFilter {
+  magnitude: Float
+  place: String
+  earthquakeType: String
+}
+
+
+extend type Mutation {
+    createEarthquake(input: CreateEarthquake!): String!
+}
+
+extend type Query {
+    earthquakes: [Earthquake!]!
+    listEarthquakes(filter: EarthquakeFilter, pagination: PaginationInput): [Earthquake!]!
+    filterEarthquakesByID(input: Int!): [Earthquake!]!
+}

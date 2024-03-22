@@ -1,0 +1,10 @@
+type Mutation {
+    createUser(input: CreateUser!): String!
+    login(input: Login!): String!
+    refreshToken(input: RefreshTokenInput!): String!
+    resetPassword(input: ResetPasswordInput!): String!
+}
+
+extend type Query {
+    users: [User!]!
+}

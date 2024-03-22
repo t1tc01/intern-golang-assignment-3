@@ -1,0 +1,9 @@
+type Location{
+  id: ID!
+  place: String
+  address: String
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  geometries: [Geometry!]
+}

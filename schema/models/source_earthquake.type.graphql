@@ -1,0 +1,10 @@
+type SourceEarthquake {
+  id: ID!
+  sID: ID
+  eqID: ID
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  earthquake: Earthquake
+  source: Source
+}

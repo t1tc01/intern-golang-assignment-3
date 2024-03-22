@@ -1,0 +1,11 @@
+type Report {
+  id: ID!
+  felt: Int
+  cdi: Float
+  mmi: Float
+  alert: String
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  earthquakes: [Earthquake!]
+}

@@ -1,0 +1,8 @@
+type FeatureType {
+  id: ID!
+  featType: String
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  ftypeEarthquakes: [FtypeEarthquake!]
+}

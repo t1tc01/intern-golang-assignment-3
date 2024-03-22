@@ -1,0 +1,38 @@
+input CreateEarthquake {
+  mag: Float!
+  time: Time!
+  updatedTime: Time
+  tz: Int
+  url: String
+  detail: String
+  status: String
+  tsunami: Int
+  sig: Int
+  net: String
+  code: String
+  nst: Int
+  dmin: Float
+  rms: Float
+  gap: Float
+  magType: String
+  eqType: String
+  #
+  place: String
+  address: String
+  #
+  featType: String
+  #
+  longitude: Float!
+  latitude: Float!
+  depth: Float!
+  #
+  felt: Int
+  cdi: Float
+  mmi: Float
+  alert: String
+  sourceName: String
+  #
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+}

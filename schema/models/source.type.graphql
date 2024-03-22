@@ -1,0 +1,8 @@
+type Source {
+  id: ID!
+  name: String
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  sourceEarthquakes: [SourceEarthquake!]
+}

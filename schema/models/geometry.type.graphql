@@ -1,0 +1,12 @@
+type Geometry {
+  id: ID!
+  locationID: ID
+  longitude: Float!
+  latitude: Float!
+  depth: Float!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  earthquakes: [Earthquake!]
+  location: Location
+}
