@@ -22,17 +22,21 @@ func (r *mutationResolver) CreateEarthquake(ctx context.Context, input model.Cre
 
 // Earthquakes is the resolver for the earthquakes field.
 func (r *queryResolver) Earthquakes(ctx context.Context) ([]*ent.Earthquake, error) {
+
+	//Authen
 	user := middleware.ForContext(ctx)
 	if user == nil {
 		var tmp []*ent.Earthquake
 		return tmp, fmt.Errorf("access denied")
 	}
+
 	return earthquake.QuerryAllEathquake(ctx)
 }
 
 // ListEarthquakes is the resolver for the listEarthquakes field.
 func (r *queryResolver) ListEarthquakes(ctx context.Context, filter *model.EarthquakeFilter, pagination *model.PaginationInput) ([]*ent.Earthquake, error) {
 
+	//
 	user := middleware.ForContext(ctx)
 	if user == nil {
 		var tmp []*ent.Earthquake
@@ -73,6 +77,8 @@ func (r *queryResolver) ListEarthquakes(ctx context.Context, filter *model.Earth
 
 // FilterEarthquakesByID is the resolver for the filterEarthquakesByID field.
 func (r *queryResolver) FilterEarthquakesByID(ctx context.Context, input int) ([]*ent.Earthquake, error) {
+
+	//
 	user := middleware.ForContext(ctx)
 	if user == nil {
 		var tmp []*ent.Earthquake

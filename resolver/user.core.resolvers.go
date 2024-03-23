@@ -8,10 +8,14 @@ import (
 	"context"
 	"fmt"
 
+	"gitlab.com/hedwig-phan/assignment-3/cmd/db"
 	"gitlab.com/hedwig-phan/assignment-3/cmd/jwt"
+	"gitlab.com/hedwig-phan/assignment-3/config"
 	"gitlab.com/hedwig-phan/assignment-3/ent"
+	"gitlab.com/hedwig-phan/assignment-3/ent/user"
 	"gitlab.com/hedwig-phan/assignment-3/graph"
 	"gitlab.com/hedwig-phan/assignment-3/internal/users"
+	"gitlab.com/hedwig-phan/assignment-3/internal/util"
 	"gitlab.com/hedwig-phan/assignment-3/model"
 )
 
@@ -31,7 +35,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	}
 
 	//
-	user, err := users.CreateUser(ctx, username, email, password)
+	user, err := users.CreateUser(ctx, username, email, password, config.ROLE_USER)
 
 	if err != nil {
 		return "", err
@@ -60,11 +64,32 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 		return "", err
 	}
 
-	ctx = context.WithValue(ctx, "Authorization", token)
-	checkToken, ok := ctx.Value("Authorization").(string)
+	user := db.Client.User.Query().Where(user.Username(username)).OnlyX(ctx)
 
-	if ok {
-		fmt.Println(checkToken)
+	if user.Role == 0 {
+
+		fmt.Println("admin logged in")
+
+		util.Ctx = context.WithValue(util.Ctx, "Authorization", token)
+		util.Ctx = context.WithValue(util.Ctx, "Admin", user)
+		_ = context.WithValue(ctx, "Authorization", token)
+		_ = context.WithValue(ctx, "Admin", token)
+
+		checkToken, ok := util.Ctx.Value("Authorization").(string)
+
+		if ok {
+			fmt.Println(checkToken)
+		}
+
+	} else {
+		fmt.Println(username + " logged in")
+
+		ctx = context.WithValue(ctx, "Authorization", token)
+		checkToken, ok := ctx.Value("Authorization").(string)
+
+		if ok {
+			fmt.Println(checkToken)
+		}
 	}
 
 	return token, nil

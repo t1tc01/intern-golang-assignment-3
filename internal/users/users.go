@@ -6,14 +6,13 @@ import (
 	"time"
 
 	"gitlab.com/hedwig-phan/assignment-3/cmd/db"
-	"gitlab.com/hedwig-phan/assignment-3/config"
 	"gitlab.com/hedwig-phan/assignment-3/ent"
 	"gitlab.com/hedwig-phan/assignment-3/ent/user"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // Create User
-func CreateUser(c context.Context, username string, email string, password string) (*ent.User, error) {
+func CreateUser(c context.Context, username string, email string, password string, role int) (*ent.User, error) {
 
 	current_time := time.Now()
 
@@ -26,7 +25,7 @@ func CreateUser(c context.Context, username string, email string, password strin
 		SetUsername(username).
 		SetPassword(hashedPassword).
 		SetEmail(email).
-		SetRole(config.ROLE_USER).
+		SetRole(role).
 		SetCreatedAt(current_time).
 		SetUpdatedAt(current_time).
 		Save(c)

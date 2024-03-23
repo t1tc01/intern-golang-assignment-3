@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"gitlab.com/hedwig-phan/assignment-3/cmd/db"
@@ -12,11 +11,11 @@ import (
 	"gitlab.com/hedwig-phan/assignment-3/internal/util"
 )
 
-type contextKey struct {
-	name string
+type ContextKey struct {
+	Name string
 }
 
-var userCtxKey = &contextKey{"user"}
+var userCtxKey = &ContextKey{"user"}
 
 // func MiddlewareAuthenticateJWT() fiber.Handler {
 // 	return func(c *fiber.Ctx) error {
@@ -100,6 +99,10 @@ func MiddlewareAuthenticateJWT() func(http.Handler) http.Handler {
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
 func ForContext(ctx context.Context) *ent.User {
 	raw, _ := ctx.Value(userCtxKey).(*ent.User)
-	fmt.Println(raw)
+	return raw
+}
+
+func ForAdminContext(ctx context.Context) *ent.User {
+	raw, _ := ctx.Value("Admin").(*ent.User)
 	return raw
 }
