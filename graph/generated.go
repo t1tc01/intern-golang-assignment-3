@@ -162,6 +162,8 @@ type ComplexityRoot struct {
 		Earthquakes           func(childComplexity int) int
 		FilterEarthquakesByID func(childComplexity int, input int) int
 		ListEarthquakes       func(childComplexity int, filter *model.EarthquakeFilter, pagination *model.PaginationInput) int
+		ListEarthquakesByDay  func(childComplexity int, filter *model.EarthquakeFilterByDay, pagination *model.PaginationInput) int
+		Logout                func(childComplexity int) int
 		Users                 func(childComplexity int) int
 	}
 
@@ -265,8 +267,10 @@ type PasswordResetRequestResolver interface {
 type QueryResolver interface {
 	Earthquakes(ctx context.Context) ([]*ent.Earthquake, error)
 	ListEarthquakes(ctx context.Context, filter *model.EarthquakeFilter, pagination *model.PaginationInput) ([]*ent.Earthquake, error)
+	ListEarthquakesByDay(ctx context.Context, filter *model.EarthquakeFilterByDay, pagination *model.PaginationInput) ([]*ent.Earthquake, error)
 	FilterEarthquakesByID(ctx context.Context, input int) ([]*ent.Earthquake, error)
 	Users(ctx context.Context) ([]*ent.User, error)
+	Logout(ctx context.Context) (string, error)
 }
 type ReportResolver interface {
 	Earthquakes(ctx context.Context, obj *ent.Report) ([]*ent.Earthquake, error)
@@ -877,6 +881,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListEarthquakes(childComplexity, args["filter"].(*model.EarthquakeFilter), args["pagination"].(*model.PaginationInput)), true
 
+	case "Query.listEarthquakesByDay":
+		if e.complexity.Query.ListEarthquakesByDay == nil {
+			break
+		}
+
+		args, err := ec.field_Query_listEarthquakesByDay_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ListEarthquakesByDay(childComplexity, args["filter"].(*model.EarthquakeFilterByDay), args["pagination"].(*model.PaginationInput)), true
+
+	case "Query.logout":
+		if e.complexity.Query.Logout == nil {
+			break
+		}
+
+		return e.complexity.Query.Logout(childComplexity), true
+
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -1210,6 +1233,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateEarthquake,
 		ec.unmarshalInputCreateUser,
 		ec.unmarshalInputEarthquakeFilter,
+		ec.unmarshalInputEarthquakeFilterByDay,
 		ec.unmarshalInputLogin,
 		ec.unmarshalInputPaginationInput,
 		ec.unmarshalInputRefreshTokenInput,
@@ -1322,6 +1346,14 @@ input EarthquakeFilter {
   earthquakeType: String
 }
 
+input EarthquakeFilterByDay {
+  magnitude: Float
+  place: String
+  earthquakeType: String
+  dayAgo: Int!
+}
+
+
 extend type Mutation {
     createEarthquake(input: CreateEarthquake!): String!
 }
@@ -1329,6 +1361,7 @@ extend type Mutation {
 extend type Query {
     earthquakes: [Earthquake!]!
     listEarthquakes(filter: EarthquakeFilter, pagination: PaginationInput): [Earthquake!]!
+    listEarthquakesByDay(filter: EarthquakeFilterByDay, pagination: PaginationInput): [Earthquake!]!
     filterEarthquakesByID(input: Int!): [Earthquake!]!
 }`, BuiltIn: false},
 	{Name: "../schema/core/user.core.graphql", Input: `type Mutation {
@@ -1340,6 +1373,7 @@ extend type Query {
 
 extend type Query {
     users: [User!]!
+    logout: String!
 }`, BuiltIn: false},
 	{Name: "../schema/models/earhquake.input.graphql", Input: `input CreateEarthquake {
   mag: Float!
@@ -1644,6 +1678,30 @@ func (ec *executionContext) field_Query_filterEarthquakesByID_args(ctx context.C
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_listEarthquakesByDay_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.EarthquakeFilterByDay
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOEarthquakeFilterByDay2ᚖgitlabᚗcomᚋhedwigᚑphanᚋassignmentᚑ3ᚋmodelᚐEarthquakeFilterByDay(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.PaginationInput
+	if tmp, ok := rawArgs["pagination"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
+		arg1, err = ec.unmarshalOPaginationInput2ᚖgitlabᚗcomᚋhedwigᚑphanᚋassignmentᚑ3ᚋmodelᚐPaginationInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pagination"] = arg1
 	return args, nil
 }
 
@@ -5373,6 +5431,117 @@ func (ec *executionContext) fieldContext_Query_listEarthquakes(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_listEarthquakesByDay(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_listEarthquakesByDay(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListEarthquakesByDay(rctx, fc.Args["filter"].(*model.EarthquakeFilterByDay), fc.Args["pagination"].(*model.PaginationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Earthquake)
+	fc.Result = res
+	return ec.marshalNEarthquake2ᚕᚖgitlabᚗcomᚋhedwigᚑphanᚋassignmentᚑ3ᚋentᚐEarthquakeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_listEarthquakesByDay(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Earthquake_id(ctx, field)
+			case "geoID":
+				return ec.fieldContext_Earthquake_geoID(ctx, field)
+			case "reportID":
+				return ec.fieldContext_Earthquake_reportID(ctx, field)
+			case "mag":
+				return ec.fieldContext_Earthquake_mag(ctx, field)
+			case "time":
+				return ec.fieldContext_Earthquake_time(ctx, field)
+			case "updatedTime":
+				return ec.fieldContext_Earthquake_updatedTime(ctx, field)
+			case "tz":
+				return ec.fieldContext_Earthquake_tz(ctx, field)
+			case "url":
+				return ec.fieldContext_Earthquake_url(ctx, field)
+			case "detail":
+				return ec.fieldContext_Earthquake_detail(ctx, field)
+			case "status":
+				return ec.fieldContext_Earthquake_status(ctx, field)
+			case "tsunami":
+				return ec.fieldContext_Earthquake_tsunami(ctx, field)
+			case "sig":
+				return ec.fieldContext_Earthquake_sig(ctx, field)
+			case "net":
+				return ec.fieldContext_Earthquake_net(ctx, field)
+			case "code":
+				return ec.fieldContext_Earthquake_code(ctx, field)
+			case "nst":
+				return ec.fieldContext_Earthquake_nst(ctx, field)
+			case "dmin":
+				return ec.fieldContext_Earthquake_dmin(ctx, field)
+			case "rms":
+				return ec.fieldContext_Earthquake_rms(ctx, field)
+			case "gap":
+				return ec.fieldContext_Earthquake_gap(ctx, field)
+			case "magType":
+				return ec.fieldContext_Earthquake_magType(ctx, field)
+			case "eqType":
+				return ec.fieldContext_Earthquake_eqType(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Earthquake_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Earthquake_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Earthquake_deletedAt(ctx, field)
+			case "geometry":
+				return ec.fieldContext_Earthquake_geometry(ctx, field)
+			case "report":
+				return ec.fieldContext_Earthquake_report(ctx, field)
+			case "ftypeEarthquakes":
+				return ec.fieldContext_Earthquake_ftypeEarthquakes(ctx, field)
+			case "sourceEarthquakes":
+				return ec.fieldContext_Earthquake_sourceEarthquakes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Earthquake", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_listEarthquakesByDay_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_filterEarthquakesByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_filterEarthquakesByID(ctx, field)
 	if err != nil {
@@ -5549,6 +5718,50 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 				return ec.fieldContext_User_token(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_logout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_logout(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Logout(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_logout(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9930,6 +10143,54 @@ func (ec *executionContext) unmarshalInputEarthquakeFilter(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputEarthquakeFilterByDay(ctx context.Context, obj interface{}) (model.EarthquakeFilterByDay, error) {
+	var it model.EarthquakeFilterByDay
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"magnitude", "place", "earthquakeType", "dayAgo"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "magnitude":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("magnitude"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Magnitude = data
+		case "place":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("place"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Place = data
+		case "earthquakeType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("earthquakeType"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EarthquakeType = data
+		case "dayAgo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dayAgo"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DayAgo = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
 	var it model.Login
 	asMap := map[string]interface{}{}
@@ -11031,6 +11292,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "listEarthquakesByDay":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_listEarthquakesByDay(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "filterEarthquakesByID":
 			field := field
 
@@ -11063,6 +11346,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_users(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "logout":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_logout(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -12780,6 +13085,14 @@ func (ec *executionContext) unmarshalOEarthquakeFilter2ᚖgitlabᚗcomᚋhedwig�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputEarthquakeFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOEarthquakeFilterByDay2ᚖgitlabᚗcomᚋhedwigᚑphanᚋassignmentᚑ3ᚋmodelᚐEarthquakeFilterByDay(ctx context.Context, v interface{}) (*model.EarthquakeFilterByDay, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputEarthquakeFilterByDay(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

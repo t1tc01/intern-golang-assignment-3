@@ -52,6 +52,13 @@ type EarthquakeFilter struct {
 	EarthquakeType *string  `json:"earthquakeType,omitempty"`
 }
 
+type EarthquakeFilterByDay struct {
+	Magnitude      *float64 `json:"magnitude,omitempty"`
+	Place          *string  `json:"place,omitempty"`
+	EarthquakeType *string  `json:"earthquakeType,omitempty"`
+	DayAgo         int      `json:"dayAgo"`
+}
+
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

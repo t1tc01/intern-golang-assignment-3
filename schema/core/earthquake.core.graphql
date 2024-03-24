@@ -9,6 +9,13 @@ input EarthquakeFilter {
   earthquakeType: String
 }
 
+input EarthquakeFilterByDay {
+  magnitude: Float
+  place: String
+  earthquakeType: String
+  dayAgo: Int!
+}
+
 
 extend type Mutation {
     createEarthquake(input: CreateEarthquake!): String!
@@ -17,5 +24,6 @@ extend type Mutation {
 extend type Query {
     earthquakes: [Earthquake!]!
     listEarthquakes(filter: EarthquakeFilter, pagination: PaginationInput): [Earthquake!]!
+    listEarthquakesByDay(filter: EarthquakeFilterByDay, pagination: PaginationInput): [Earthquake!]!
     filterEarthquakesByID(input: Int!): [Earthquake!]!
 }

@@ -118,6 +118,14 @@ func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
 	panic(fmt.Errorf("not implemented: Users - users"))
 }
 
+// Logout is the resolver for the logout field.
+func (r *queryResolver) Logout(ctx context.Context) (string, error) {
+	ctx = context.Background()
+	util.Ctx = context.Background()
+
+	return "Logged out", nil
+}
+
 // Mutation returns graph.MutationResolver implementation.
 func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 

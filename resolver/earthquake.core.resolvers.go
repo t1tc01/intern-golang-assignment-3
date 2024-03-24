@@ -75,6 +75,52 @@ func (r *queryResolver) ListEarthquakes(ctx context.Context, filter *model.Earth
 	return earthquake.QuerryEarthquakeMultiFiltered(ctx, limit, offset, mag, place, eq_type)
 }
 
+// ListEarthquakesByDay is the resolver for the listEarthquakesByDay field.
+func (r *queryResolver) ListEarthquakesByDay(ctx context.Context, filter *model.EarthquakeFilterByDay, pagination *model.PaginationInput) ([]*ent.Earthquake, error) {
+	//
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		var tmp []*ent.Earthquake
+		return tmp, fmt.Errorf("access denied")
+	}
+
+	limit := 1
+	offset := 10
+	day := 30
+
+	var mag float64 = 0
+	place := ""
+	eq_type := ""
+
+	if pagination != nil {
+		if pagination.Limit != nil {
+			limit = *pagination.Limit
+		}
+		if pagination.Offset != nil {
+			offset = *pagination.Offset
+		}
+	}
+
+	if filter != nil {
+		if filter.Magnitude != nil {
+			mag = *filter.Magnitude
+		}
+		if filter.Place != nil {
+			place = *filter.Place
+		}
+
+		if filter.EarthquakeType != nil {
+			eq_type = *filter.EarthquakeType
+		}
+
+		if filter.DayAgo != 0 {
+			day = filter.DayAgo
+		}
+	}
+
+	return earthquake.QuerryEarthquakeMultiFilteredByDay(ctx, limit, offset, mag, place, eq_type, day)
+}
+
 // FilterEarthquakesByID is the resolver for the filterEarthquakesByID field.
 func (r *queryResolver) FilterEarthquakesByID(ctx context.Context, input int) ([]*ent.Earthquake, error) {
 
