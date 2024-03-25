@@ -3,7 +3,9 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"strings"
 
+	"github.com/gofiber/fiber/v2"
 	"gitlab.com/hedwig-phan/assignment-3/cmd/db"
 	"gitlab.com/hedwig-phan/assignment-3/cmd/jwt"
 	"gitlab.com/hedwig-phan/assignment-3/ent"
@@ -94,6 +96,37 @@ func MiddlewareAuthenticateJWT() func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// Middle ware using fiber
+func MiddlewareAuthenticateJWTFb() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		header := c.Get("Authorization")
+		if header == "" {
+			return c.Next()
+		}
+
+		// Forward the Authorization header via context for further validation in the directive
+		tokenStr := strings.TrimPrefix(header, "Bearer ")
+		c.Context().SetUserValue("have_token", true)
+		c.Context().SetUserValue("token", tokenStr)
+		return c.Next()
+	}
+}
+
+// Check have token or not
+func HaveToken(ctx context.Context) bool {
+	token, _ := ctx.Value("have_token").(bool)
+	return token
+}
+
+// Get token
+func Token(ctx context.Context) string {
+	token, ok := ctx.Value("token").(string)
+	if !ok {
+		return ""
+	}
+	return token
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
