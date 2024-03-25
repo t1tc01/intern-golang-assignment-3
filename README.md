@@ -82,4 +82,10 @@ query {
 }
 
 ```
+## Database Schema
+Earthquake database <br>
+![This is database design of this repo](/assets/images/earthquake.png)
+
+User database <br>
+![This is database design of this repo](/assets/images/authen-system.png)
 
